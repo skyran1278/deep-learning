@@ -1,7 +1,8 @@
-from openpyxl import load_workbook
-import numpy as np
-import matplotlib.pyplot as plt
 import math
+
+import matplotlib.pyplot as plt
+import numpy as np
+from openpyxl import load_workbook
 
 # ================= initialize =============================
 WB = load_workbook(filename='ResponseSpectrum.xlsx')
@@ -28,7 +29,7 @@ PERIODS = get_data_byexcel(min_row=3, min_col=1, max_row=82, max_col=1)
 # ================= hw1_2_a: 取加速度最大值 =============================
 def hw1_2_a():
     pga = np.amax(ACCELERATIONS, axis=0)
-    print('PGA:', pga)
+    print('PGA: \n', pga)
 
 
 hw1_2_a()
@@ -45,6 +46,8 @@ def scale_linear_bycolumn(raw_data, norm=100.0):
 def hw1_2_b():
     normalize_acceleration = scale_linear_bycolumn(
         raw_data=ACCELERATIONS, norm=0.33)
+
+    print(normalize_acceleration)
 
     plt.plot(PERIODS, normalize_acceleration)
     plt.legend(['TCU015', 'TCU029', 'TCU076', 'TCU082', 'TCU089'])
@@ -168,10 +171,10 @@ BASE_SHEAR_FACTOR, QUOTIENTS = hw1_2_d()
 def hw1_2_e():
     design_base_shear_factor = BASE_SHEAR_FACTOR[:, 0]
     factor = np.mean(NORMALIZE_ACCELERATION, axis=1) / design_base_shear_factor
-    print(factor)
-    print(QUOTIENTS)
+
     plt.plot(PERIODS, factor)
     plt.plot(PERIODS, QUOTIENTS)
+    plt.legend(['averaged acceleration response spectra divide V/W', '1.4*αy*Fu'])
     plt.show()
 
 
@@ -182,17 +185,29 @@ hw1_2_e()
 def hw1_2_f():
     omega = 2 * math.pi / PERIODS
     average_acceleration = np.mean(NORMALIZE_ACCELERATION, axis=1)
-    plt.plot(PERIODS, omega ** 2 * NORMALIZE_ACCELERATION)
-    plt.plot(PERIODS, omega ** 2 * average_acceleration)
+    average_acceleration = np.reshape(average_acceleration, (80, 1))
+
+    plt.plot(PERIODS, NORMALIZE_ACCELERATION / (omega ** 2))
+    plt.plot(PERIODS, average_acceleration / (omega ** 2))
     plt.legend(['TCU015', 'TCU029', 'TCU076', 'TCU082', 'TCU089', 'AVERAGE'])
     plt.show()
 
-    return omega ** 2 * NORMALIZE_ACCELERATION
+    return NORMALIZE_ACCELERATION / (omega ** 2)
 
 
 DISPLACEMENT_ELASTIC = hw1_2_f()
 
 
 # ================= hw1_2_g: =============================
-cr3 = DISPLACEMENT_R3 / DISPLACEMENT_ELASTIC
-cr5 = DISPLACEMENT_R5 / DISPLACEMENT_ELASTIC
+def hw1_2_g():
+    cr3 = DISPLACEMENT_R3 / DISPLACEMENT_ELASTIC
+    cr5 = DISPLACEMENT_R5 / DISPLACEMENT_ELASTIC
+
+    plt.plot(PERIODS, cr3, color='0.7', ls='--')
+    plt.plot(PERIODS, cr5, color='0.7', ls=':')
+    plt.plot(PERIODS, 5.5 * np.ones((80, 1)), label='CR = 5.5 for SMRF')
+    plt.legend()
+    plt.show()
+
+
+hw1_2_g()
