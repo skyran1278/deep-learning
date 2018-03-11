@@ -22,8 +22,9 @@ plt.show()
 
 #     def goobye(self):
 #         print("Good-bye " + self.name + "!")
-
-
+# 測試
+for target_list in expression_list:
+    pass
 # m = Man("David")
 # m.hello()
 # m.goobye()
