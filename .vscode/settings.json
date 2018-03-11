@@ -1,4 +1,4 @@
 {
-  "python.pythonPath": "C:\\Users\\skyran\\AppData\\Local\\Programs\\Python\\Python36\\python.exe",
+  "python.pythonPath": "/usr/local/bin/python3",
   "editor.tabSize": 4
 }
