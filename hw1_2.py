@@ -18,6 +18,10 @@ def get_data_byexcel(min_row, min_col, max_row, max_col):
 
 
 ACCELERATIONS = get_data_byexcel(min_row=3, min_col=2, max_row=82, max_col=6)
+DISPLACEMENT_R3 = get_data_byexcel(
+    min_row=3, min_col=9, max_row=82, max_col=13)
+DISPLACEMENT_R5 = get_data_byexcel(
+    min_row=3, min_col=16, max_row=82, max_col=20)
 PERIODS = get_data_byexcel(min_row=3, min_col=1, max_row=82, max_col=1)
 
 
@@ -171,10 +175,24 @@ def hw1_2_e():
     plt.show()
 
 
+hw1_2_e()
+
+
 # ================= hw1_2_f: =============================
-omega = 2 * math.pi / PERIODS
-average_acceleration = np.mean(NORMALIZE_ACCELERATION, axis=1)
-plt.plot(PERIODS, omega ** 2 * NORMALIZE_ACCELERATION)
-plt.plot(PERIODS, omega ** 2 * average_acceleration)
-plt.legend(['TCU015', 'TCU029', 'TCU076', 'TCU082', 'TCU089', 'AVERAGE'])
-plt.show()
+def hw1_2_f():
+    omega = 2 * math.pi / PERIODS
+    average_acceleration = np.mean(NORMALIZE_ACCELERATION, axis=1)
+    plt.plot(PERIODS, omega ** 2 * NORMALIZE_ACCELERATION)
+    plt.plot(PERIODS, omega ** 2 * average_acceleration)
+    plt.legend(['TCU015', 'TCU029', 'TCU076', 'TCU082', 'TCU089', 'AVERAGE'])
+    plt.show()
+
+    return omega ** 2 * NORMALIZE_ACCELERATION
+
+
+DISPLACEMENT_ELASTIC = hw1_2_f()
+
+
+# ================= hw1_2_g: =============================
+cr3 = DISPLACEMENT_R3 / DISPLACEMENT_ELASTIC
+cr5 = DISPLACEMENT_R5 / DISPLACEMENT_ELASTIC
