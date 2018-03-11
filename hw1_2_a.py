@@ -23,7 +23,7 @@ PERIODS = get_data_byexcel(min_row=3, min_col=1, max_row=82, max_col=1)
 
 # ================= hw1_2_a: 取加速度最大值 =============================
 pga = np.amax(ACCELERATIONS, axis=0)
-print("PGA:", pga)
+# print("PGA:", pga)
 
 
 # ================= hw1_2_b:正規化加速度後繪圖 =============================
@@ -35,14 +35,15 @@ def scale_linear_bycolumn(raw_data, norm=100.0):
 normalize_acceleration = scale_linear_bycolumn(
     raw_data=ACCELERATIONS, norm=0.33)
 
-plt.plot(PERIODS, normalize_acceleration)
-plt.show()
+# plt.plot(PERIODS, normalize_acceleration)
+# plt.show()
 
 
 # ================= hw1_2_c:解釋 αy、Fu、1.4 =============================
 # αy：αy is defined as the first yield seismic force amplification factor that is dependent on the structure types and design method.
 # Fu：the seismic force reduction factor. This is based on the equal displacement principle between the elastic and the EPP systems for the long period range and the equal energy principle for short periods.
 # 1.4：the constant 1.4 means the over-strength factor between the ultimate and the first yield force.
+
 
 # ================= hw1_2_d:繪圖 =============================
 important_factor = 1
@@ -53,36 +54,73 @@ sm1 = 0.55
 sms = 0.88
 ductility_capacity = 4.8
 
-period0 = sd1 / sds
+period_0 = sd1 / sds
+period_0_m = sm1 / sms
 
 ra = 1 + (ductility_capacity - 1) / 1.5
+
+base_shear_factor = np.array([])
 
 for period in PERIODS:
 
     # sad
-    if period <= 0.2 * period0:
-        sad = sds * (0.4 + 3 * period / period0)
-    elif 0.2 * period0 <= period <= period0:
+    if period <= 0.2 * period_0:
+        sad = sds * (0.4 + 3 * period / period_0)
+    elif 0.2 * period_0 <= period <= period_0:
         sad = sds
-    elif period0 <= period <= 2.5 * period0:
+    elif period_0 <= period <= 2.5 * period_0:
         sad = sd1 / period
-    elif period >= 2.5 * period0:
+    elif period > 2.5 * period_0:
         sad = 0.4 * sds
 
     # fu
-    if period >= period0:
+    if period >= period_0:
         fu = ra
-    elif 0.6 * period0 <= period <= period0:
+    elif 0.6 * period_0 <= period <= period_0:
         fu = math.sqrt(2 * ra - 1) + (ra - math.sqrt(2 * ra - 1)) * \
-            (period - 0.6 * period0) / (0.4 * period0)
-    elif 0.2 * period0 <= period <= 0.6 * period0:
+            (period - 0.6 * period_0) / (0.4 * period_0)
+    elif 0.2 * period_0 <= period <= 0.6 * period_0:
         fu = math.sqrt(2 * ra - 1)
-    elif period <= 0.2 * period0:
+    elif period <= 0.2 * period_0:
         fu = math.sqrt(2 * ra - 1) + (math.sqrt(2 * ra - 1) - 1) * \
-            (period - 0.2 * period0) / (0.2 * period0)
+            (period - 0.2 * period_0) / (0.2 * period_0)
 
-    if expression:
-        pass
+    # design_modified_ratio
+    if sad / fu <= 0.3:
+        design_modified_ratio = sad / fu
+    elif 0.3 <= sad / fu <= 0.8:
+        design_modified_ratio = 0.52 * sad / fu + 0.144
+    elif sad / fu > 0.8:
+        design_modified_ratio = 0.7 * sad / fu
+
+    # sam
+    if period <= 0.2 * period_0_m:
+        sam = sms * (0.4 + 3 * period / period_0_m)
+    elif 0.2 * period_0_m <= period <= period_0_m:
+        sam = sms
+    elif period_0_m <= period <= 2.5 * period_0_m:
+        sam = sm1 / period
+    elif period > 2.5 * period_0_m:
+        sam = 0.4 * sms
+
+    # fu_m
+    if period >= period_0_m:
+        fu_m = ductility_capacity
+    elif 0.6 * period_0_m <= period <= period_0_m:
+        fu_m = math.sqrt(2 * ductility_capacity - 1) + (ductility_capacity - math.sqrt(2 * ductility_capacity - 1)) * \
+            (period - 0.6 * period_0_m) / (0.4 * period_0_m)
+    elif 0.2 * period_0_m <= period <= 0.6 * period_0_m:
+        fu_m = math.sqrt(2 * ductility_capacity - 1)
+    elif period <= 0.2 * period_0_m:
+        fu_m = math.sqrt(2 * ductility_capacity - 1) + (math.sqrt(2 * ductility_capacity - 1) - 1) * \
+            (period - 0.2 * period_0_m) / (0.2 * period_0_m)
+
+    if sam / fu_m <= 0.3:
+        max_modified_ratio = sam / fu_m
+    elif 0.3 <= sam / fu_m <= 0.8:
+        max_modified_ratio = 0.52 * sam / fu_m + 0.144
+    elif sam / fu_m > 0.8:
+        max_modified_ratio = 0.7 * sam / fu_m
 
     design_base_shear_factor = important_factor / \
         (1.4 * alpha_y) * design_modified_ratio
@@ -90,3 +128,14 @@ for period in PERIODS:
         (1.4 * alpha_y) * max_modified_ratio
     min_base_shear_factor = important_factor * \
         fu / (4.2 * alpha_y) * design_modified_ratio
+
+    base_shear_factor = np.append(base_shear_factor, [
+                                  design_base_shear_factor, max_base_shear_factor, min_base_shear_factor])
+
+base_shear_factor = np.reshape(base_shear_factor, (80, 3))
+
+print(base_shear_factor)
+
+plt.plot(PERIODS, base_shear_factor)
+plt.legend(['V/W', 'V*/W', 'VM/W'])
+plt.show()
