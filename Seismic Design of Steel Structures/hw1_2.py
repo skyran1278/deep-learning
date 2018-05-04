@@ -5,7 +5,8 @@ import numpy as np
 from openpyxl import load_workbook
 
 # ================= initialize =============================
-WB = load_workbook(filename='ResponseSpectrum.xlsx')
+WB = load_workbook(
+    filename='Seismic Design of Steel Structures/ResponseSpectrum.xlsx')
 
 WS = WB['Sheet1']
 
@@ -29,7 +30,7 @@ PERIODS = get_data_byexcel(min_row=3, min_col=1, max_row=82, max_col=1)
 # ================= hw1_2_a: 取加速度最大值 =============================
 def hw1_2_a():
     pga = np.amax(ACCELERATIONS, axis=0)
-    print('PGA: \n', pga)
+    # print('PGA: \n', pga)
 
 
 hw1_2_a()
@@ -47,11 +48,10 @@ def hw1_2_b():
     normalize_acceleration = scale_linear_bycolumn(
         raw_data=ACCELERATIONS, norm=0.33)
 
-    print(normalize_acceleration)
-
+    # print(normalize_acceleration)
+    plt.figure()
     plt.plot(PERIODS, normalize_acceleration)
     plt.legend(['TCU015', 'TCU029', 'TCU076', 'TCU082', 'TCU089'])
-    plt.show()
 
     return normalize_acceleration
 
@@ -157,9 +157,9 @@ def hw1_2_d():
 
     base_shear_factor = np.reshape(base_shear_factor, (80, 3))
 
+    plt.figure()
     plt.plot(PERIODS, base_shear_factor)
     plt.legend(['V/W', 'V*/W', 'VM/W'])
-    plt.show()
 
     return base_shear_factor, 1.4 * alpha_y * quotients
 
@@ -172,10 +172,10 @@ def hw1_2_e():
     design_base_shear_factor = BASE_SHEAR_FACTOR[:, 0]
     factor = np.mean(NORMALIZE_ACCELERATION, axis=1) / design_base_shear_factor
 
+    plt.figure()
     plt.plot(PERIODS, factor)
     plt.plot(PERIODS, QUOTIENTS)
     plt.legend(['averaged acceleration response spectra divide V/W', '1.4*αy*Fu'])
-    plt.show()
 
 
 hw1_2_e()
@@ -187,12 +187,12 @@ def hw1_2_f():
     average_acceleration = np.mean(NORMALIZE_ACCELERATION, axis=1)
     average_acceleration = np.reshape(average_acceleration, (80, 1))
 
-    plt.plot(PERIODS, NORMALIZE_ACCELERATION / (omega ** 2))
-    plt.plot(PERIODS, average_acceleration / (omega ** 2))
+    plt.figure()
+    plt.plot(PERIODS, NORMALIZE_ACCELERATION * 9.81 / (omega ** 2))
+    plt.plot(PERIODS, average_acceleration * 9.81 / (omega ** 2))
     plt.legend(['TCU015', 'TCU029', 'TCU076', 'TCU082', 'TCU089', 'AVERAGE'])
-    plt.show()
 
-    return NORMALIZE_ACCELERATION / (omega ** 2)
+    return NORMALIZE_ACCELERATION * 9.81 / (omega ** 2)
 
 
 DISPLACEMENT_ELASTIC = hw1_2_f()
@@ -203,10 +203,10 @@ def hw1_2_g():
     cr3 = DISPLACEMENT_R3 / DISPLACEMENT_ELASTIC
     cr5 = DISPLACEMENT_R5 / DISPLACEMENT_ELASTIC
 
-    plt.plot(PERIODS, cr3, color='0.7', ls='--')
-    plt.plot(PERIODS, cr5, color='0.7', ls=':')
-    plt.plot(PERIODS, 5.5 * np.ones((80, 1)), label='CR = 5.5 for SMRF')
-    plt.legend()
+    plt.figure()
+    plt.plot(PERIODS, cr3, linestyle='--')
+    plt.plot(PERIODS, cr5, linestyle=':')
+    plt.plot(PERIODS, np.ones((80, 1)))
     plt.show()
 
 
