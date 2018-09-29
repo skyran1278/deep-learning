@@ -1,19 +1,24 @@
 # coding: utf-8
-import sys, os
+import sys
+import os
 sys.path.append(os.pardir)  # 親ディレクトリのファイルをインポートするための設定
 import numpy as np
 import pickle
 from dataset.mnist import load_mnist
 from common.functions import sigmoid, softmax
 
+my_path = os.path.abspath(os.path.dirname(__file__))
+
 
 def get_data():
-    (x_train, t_train), (x_test, t_test) = load_mnist(normalize=True, flatten=True, one_hot_label=False)
+    (x_train, t_train), (x_test, t_test) = load_mnist(
+        normalize=True, flatten=True, one_hot_label=False)
     return x_test, t_test
 
 
 def init_network():
-    with open("sample_weight.pkl", 'rb') as f:
+    path = os.path.join(my_path, "./sample_weight.pkl")
+    with open(path, 'rb') as f:
         network = pickle.load(f)
     return network
 
@@ -37,7 +42,7 @@ network = init_network()
 accuracy_cnt = 0
 for i in range(len(x)):
     y = predict(network, x[i])
-    p= np.argmax(y) # 最も確率の高い要素のインデックスを取得
+    p = np.argmax(y)  # 最も確率の高い要素のインデックスを取得
     if p == t[i]:
         accuracy_cnt += 1
 
