@@ -1,6 +1,7 @@
 # coding: utf-8
 import sys
 import os
+import time
 sys.path.append(os.pardir)  # 親ディレクトリのファイルをインポートするための設定
 import numpy as np
 import pickle
@@ -34,6 +35,8 @@ def predict(network, x):
     return y
 
 
+tStart = time.time()
+
 x, t = get_data()
 network = init_network()
 
@@ -45,5 +48,7 @@ for i in range(0, len(x), batch_size):
     y_batch = predict(network, x_batch)
     p = np.argmax(y_batch, axis=1)
     accuracy_cnt += np.sum(p == t[i:i+batch_size])
+tEnd = time.time()
 
 print("Accuracy:" + str(float(accuracy_cnt) / len(x)))
+print(tEnd - tStart)  # 的確比較快
