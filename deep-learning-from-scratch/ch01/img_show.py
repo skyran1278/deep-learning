@@ -8,7 +8,7 @@ from matplotlib.image import imread
 # 而不是執行程式的相對
 # img = imread('../dataset/lena.png')  # 画像の読み込み
 # img = imread('./dataset/lena.png')  # 相對於 deep-learning-from-scratch
-my_path = os.path.abspath(os.path.dirname(__file__))
+ch01 = os.path.abspath(os.path.dirname(__file__))
 # 過程演示
 # print(__file__)
 # print(os.path.dirname(__file__))
@@ -16,8 +16,8 @@ my_path = os.path.abspath(os.path.dirname(__file__))
 # print(os.path.abspath(os.path.dirname(__file__)))
 # print(os.path.dirname(os.path.abspath(__file__)))
 # print(os.path.dirname(__file__))
-# print(my_path)
-path = os.path.join(my_path, "./../dataset/lena.png")
+# print(ch01)
+path = os.path.join(ch01, "./../dataset/lena.png")
 img = imread(path)  # 絕對路徑
 
 plt.imshow(img)
